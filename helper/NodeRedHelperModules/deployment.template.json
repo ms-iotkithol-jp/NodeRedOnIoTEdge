@@ -1,0 +1,150 @@
+{
+  "$schema-template": "2.0.0",
+  "modulesContent": {
+    "$edgeAgent": {
+      "properties.desired": {
+        "schemaVersion": "1.0",
+        "runtime": {
+          "type": "docker",
+          "settings": {
+            "minDockerVersion": "v1.25",
+            "loggingOptions": "",
+            "registryCredentials": {}
+          }
+        },
+        "systemModules": {
+          "edgeAgent": {
+            "type": "docker",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-agent:1.0",
+              "createOptions": {}
+            }
+          },
+          "edgeHub": {
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-hub:1.0",
+              "createOptions": {
+                "HostConfig": {
+                  "PortBindings": {
+                    "5671/tcp": [
+                      {
+                        "HostPort": "5671"
+                      }
+                    ],
+                    "8883/tcp": [
+                      {
+                        "HostPort": "8883"
+                      }
+                    ],
+                    "443/tcp": [
+                      {
+                        "HostPort": "443"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "modules": {
+          "FileSyncHelperModule": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.FileSyncHelperModule}",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "< directory name on host side >:< mounted directory name in container >"
+                  ]
+                }
+              }
+            },
+            "env": {
+              "BLOB_ON_EDGE_MODULE": {
+                  "value": "localblobstorage"
+              },
+              "BLOB_ON_EDGE_ACCOUNT_NAME": {
+                  "value": "< Account Name of Blob on Edge - should be same text for LOCAL_STORAGE_ACCOUNT_NAME! >"
+              },
+              "BLOB_ON_EDGE_ACCOUNT_KEY": {
+                  "value": "< Account Key of Blob on Edge -should be same text for LOCAL_STORAGE_ACCOUNT_KEY! >"
+              },
+              "BLOB_ON_EDGE_CONTAINER_NAME": {
+                  "value": "< Container Name for Cloud syncing >"
+              }
+            }
+          },
+          "localblobstorage": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "mcr.microsoft.com/azure-blob-storage:1.2.1-linux-arm32v7",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "/srv/containerdata:/blobroot"
+                  ],
+                  "PortBindings": {
+                    "11002/tcp": [
+                      {
+                        "HostPort": "11002"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "env": {
+              "LOCAL_STORAGE_ACCOUNT_NAME": {
+                "value": "< Account Name of Blob on Edge >"
+              },
+              "LOCAL_STORAGE_ACCOUNT_KEY": {
+                "value": "< Account Key of Blob on Edge >"
+              }
+            }
+          }
+        }
+      }
+    },
+    "$edgeHub": {
+      "properties.desired": {
+        "schemaVersion": "1.0",
+        "routes": {
+          "FileSyncHelperModuleToIoTHub": "FROM /messages/modules/FileSyncHelperModule/outputs/* INTO $upstream"
+        },
+        "storeAndForwardConfiguration": {
+          "timeToLiveSecs": 7200
+        }
+      }
+    },
+    "localblobstorage": {
+      "properties.desired": {
+        "deviceAutoDeleteProperties": {
+          "deleteOn": true,
+          "deleteAfterMinutes": 5,
+          "retainWhileUploading": true
+        },
+        "deviceToCloudUploadProperties": {
+          "uploadOn": true,
+          "uploadOrder": "OldestFirst",
+          "cloudStorageConnectionString": "< Connection String for Azure Storage Account >",
+          "storageContainersForUpload": {
+            "flows": {
+              "target": "< container name ?"
+            }
+          },
+          "deleteAfterUpload": true
+        }
+      }
+    }
+  }
+}

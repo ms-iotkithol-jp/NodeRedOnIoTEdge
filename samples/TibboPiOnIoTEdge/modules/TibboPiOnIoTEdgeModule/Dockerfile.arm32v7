@@ -1,0 +1,30 @@
+FROM nodered/node-red-docker:0.20.2-rpi
+
+USER root
+
+RUN apt-get update
+
+RUN npm install -g n \
+    && n 10.15.3
+
+RUN apt-get install -y \
+    gcc \
+    python3-dev \
+    python3-pip \
+    i2c-tools \
+    --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install RPi.GPIO
+
+USER node-red
+
+WORKDIR /home/node-red/
+
+COPY --chown=node-red:node-red node-red-contrib-tibbo-pi-p3/ ./node-red-contrib-tibbo-pi-p3/
+COPY --chown=node-red:node-red noderededgemodule/noderedmodule/ ./node-red-contrib-azure-iot/
+
+WORKDIR /usr/src/node-red/
+
+RUN npm install /home/node-red/node-red-contrib-tibbo-pi-p3/
+RUN npm install /home/node-red/node-red-contrib-azure-iot

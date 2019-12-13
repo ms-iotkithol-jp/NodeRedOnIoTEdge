@@ -1,0 +1,6 @@
+[submodule "samples/TibboPiOnIoTEdge/modules/TibboPiOnIoTEdgeModule/node-red-contrib-tibbo-pi-p3"]
+	path = samples/TibboPiOnIoTEdge/modules/TibboPiOnIoTEdgeModule/node-red-contrib-tibbo-pi-p3
+	url = https://github.com/cw-tpdev/node-red-contrib-tibbo-pi-p3.git
+[submodule "samples/TibboPiOnIoTEdge/modules/TibboPiOnIoTEdgeModule/noderededgemodule"]
+	path = samples/TibboPiOnIoTEdge/modules/TibboPiOnIoTEdgeModule/noderededgemodule
+	url = https://github.com/iotblackbelt/noderededgemodule.git
