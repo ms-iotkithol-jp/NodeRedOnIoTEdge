@@ -1,0 +1,121 @@
+{
+    "modulesContent": {
+      "$edgeAgent": {
+        "properties.desired": {
+          "schemaVersion": "1.0",
+          "runtime": {
+            "type": "docker",
+            "settings": {
+              "minDockerVersion": "v1.25",
+              "loggingOptions": "",
+              "registryCredentials": {}
+            }
+          },
+          "systemModules": {
+            "edgeAgent": {
+              "type": "docker",
+              "settings": {
+                "image": "mcr.microsoft.com/azureiotedge-agent:1.0",
+                "createOptions": "{}"
+              }
+            },
+            "edgeHub": {
+              "type": "docker",
+              "status": "running",
+              "restartPolicy": "always",
+              "settings": {
+                "image": "mcr.microsoft.com/azureiotedge-hub:1.0",
+                "createOptions": "{\"HostConfig\":{\"PortBindings\":{\"5671/tcp\":[{\"HostPort\":\"5671\"}],\"8883/tcp\":[{\"HostPort\":\"8883\"}],\"443/tcp\":[{\"HostPort\":\"443\"}]}}}"
+              }
+            }
+          },
+          "modules": {
+            "TibboPiIoTEdgeModule": {
+              "version": "1.0",
+              "type": "docker",
+              "status": "running",
+              "restartPolicy": "always",
+              "env": {},
+              "settings": {
+                "image": "embeddedgeorge/tibbopi-iot-edge-module:0.2.1-arm32v7",
+                "createOptions": "{\"HostConfig\":{\"PortBindings\":{\"5012/tcp\":[{\"HostPort\":\"5012\"}],\"1880/tcp\":[{\"HostPort\":\"1880\"}]},\"Binds\":[\"/etc/tibbo-pi/data:/data\",\"/dev/mem:/dev/mem\",\"/dev/i2c-1:/dev/i2c-1\"],\"Privileged\":true}}"
+              }
+            },
+            "localblobstorage": {
+              "version": "1.0",
+              "type": "docker",
+              "status": "running",
+              "restartPolicy": "always",
+              "settings": {
+                "image": "mcr.microsoft.com/azure-blob-storage:1.2.1-linux-arm32v7",
+                "createOptions": "{\"HostConfig\":{\"Binds\":[\"/srv/containerdata:/blobroot\"],\"PortBindings\":{\"11002/tcp\":[{\"HostPort\":\"11002\"}]}}}"
+              },
+              "env": {
+                "LOCAL_STORAGE_ACCOUNT_KEY": {
+                  "value": "4lQilKwVxO24f1gNS8v3qv9qdT/EXTFkv7JH5w/4qICEtRTvF7TJauQ1y/gAwoqxXyJH5Nn4iAztsqyTovN/7A=="
+                },
+                "LOCAL_STORAGE_ACCOUNT_NAME": {
+                  "value": "localaccount"
+                }
+              }
+            },
+            "FileSyncHelperModule": {
+              "version": "1.0",
+              "type": "docker",
+              "status": "running",
+              "restartPolicy": "always",
+              "settings": {
+                "image": "embeddedgeorge/file-sync-helper:0.1.0-arm32v7",
+                "createOptions": "{\"HostConfig\":{\"Binds\":[\"/etc/tibbo-pi/data:/data\"]}}"
+              },
+              "env": {
+                "BLOB_ON_EDGE_MODULE": {
+                  "value": "localblobstorage"
+                },
+                "BLOB_ON_EDGE_ACCOUNT_NAME": {
+                  "value": "localaccount"
+                },
+                "BLOB_ON_EDGE_ACCOUNT_KEY": {
+                  "value": "4lQilKwVxO24f1gNS8v3qv9qdT/EXTFkv7JH5w/4qICEtRTvF7TJauQ1y/gAwoqxXyJH5Nn4iAztsqyTovN/7A=="
+                },
+                "FLOWS_CONTAINER_NAME": {
+                  "value": "flows"
+                }
+              }
+            }
+          }
+        }
+      },
+      "$edgeHub": {
+        "properties.desired": {
+          "schemaVersion": "1.0",
+          "routes": {
+            "TibboPiIoTEdgeModuleToIoTHub": "FROM /messages/modules/TibboPiIoTEdgeModule/outputs/* INTO $upstream"
+          },
+          "storeAndForwardConfiguration": {
+            "timeToLiveSecs": 7200
+          }
+        }
+      },
+      "localblobstorage": {
+        "properties.desired": {
+          "deviceAutoDeleteProperties": {
+            "deleteOn": true,
+            "deleteAfterMinutes": 5,
+            "retainWhileUploading": true
+          },
+          "deviceToCloudUploadProperties": {
+            "uploadOn": true,
+            "uploadOrder": "OldestFirst",
+            "cloudStorageConnectionString": "< Connection String for Azure Storage Account >",
+            "storageContainersForUpload": {
+              "flows": {
+                "target": "nodered-flows"
+              }
+            },
+            "deleteAfterUpload": true
+          }
+        }
+      }
+    }
+  }

@@ -59,7 +59,8 @@
             "settings": {
               "image": "${MODULES.TibboPiOnIoTEdgeModule.arm32v7}",
               "createOptions": {
-                "PortBindings": {
+                "HostConfig": {
+                  "PortBindings": {
                   "5012/tcp": [
                     {
                       "HostPort": "5012"
@@ -78,6 +79,7 @@
                 ],
                 "Privileged": true
               }
+            }
             }
           },
           "FileSyncHelperModule": {
