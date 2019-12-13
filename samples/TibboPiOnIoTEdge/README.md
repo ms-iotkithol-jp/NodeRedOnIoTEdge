@@ -13,7 +13,42 @@ $ sudo docker build -t tibbopi-iot-edge-module -f Dockerfile.arm32v7 .
 $ sudo docker build tag tibbopi-iot-edge-module <i>your-docker-repository</i>/tibbopi-iot-edge-module  
 $ docker push <i>your-docker-repository</i>/tibbopi-iot-edge-module:latest  
 これで、Azure IoT Hub、IoT Edge デバイスから使えるようになるので、Azure ポータルなどで、IoT Edge デバイスに配置する。 
-[Blob on Edge](https://docs.microsoft.com/ja-jp/azure/iot-edge/how-to-access-host-storage-from-module) と [file-sync-helper](../../helper/NodeRedHelperModules) を併用すると、Node-Red のフローをリモートで収集・更新が可能になる。 
+配置の際のコンテナ―生成オプションはは、  
+```json
+{
+  "HostConfig": {
+    "PortBindings": {
+      "5671/tcp": [
+        {
+          "HostPort": "5671"
+        }
+      ],
+      "8883/tcp": [
+        {
+          "HostPort": "8883"
+        }
+      ],
+      "443/tcp": [
+        {
+          "HostPort": "443"
+        }
+      ],
+      "1880/tcp": [
+        {
+          "HostPort": "1880"
+        }
+      ]
+    },
+    "Binds": [
+      "/etc/tibbo-pi/data:/data",
+      "/dev/mem:/dev/mem",
+      "/dev/i2c-1:/dev/i2c-1"
+    ],
+    "Privileged": true
+  }
+}```
+
+Blob on Edge と file-sync-helper を併用すると、Node-Red のフローをリモートで収集・更新が可能になる。 
 
 #### VS Code + Azure IoT Edge Extension を使う場合 
 ※ 書きかけ 
