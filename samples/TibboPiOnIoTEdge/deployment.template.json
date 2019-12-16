@@ -61,25 +61,21 @@
               "createOptions": {
                 "HostConfig": {
                   "PortBindings": {
-                  "5012/tcp": [
-                    {
-                      "HostPort": "5012"
-                    }
+                    "5012/tcp": [ 
+                      { "HostPort": "5012" }
+                    ],
+                    "1880/tcp": [
+                      { "HostPort": "1880" }
+                    ]
+                  },
+                  "Binds": [
+                    "/etc/tibbo-pi/data:/data",
+                    "/dev/mem:/dev/mem",
+                    "/dev/i2c-1:/dev/i2c-1"
                   ],
-                  "1880/tcp": [
-                    {
-                      "HostPort": "1880"
-                    }
-                  ]
-                },
-                "Binds": [
-                  "/etc/tibbo-pi/data:/data",
-                  "/dev/mem:/dev/mem",
-                  "/dev/i2c-1:/dev/i2c-1"
-                ],
-                "Privileged": true
+                  "Privileged": true
+                }
               }
-            }
             }
           },
           "FileSyncHelperModule": {
