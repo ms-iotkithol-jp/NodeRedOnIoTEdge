@@ -8,12 +8,12 @@ namespace SampleModule
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Net.Http;
     using Microsoft.Azure.Devices.Client;
     using Microsoft.Azure.Devices.Client.Transport.Mqtt;
 
     class Program
     {
-        static int counter;
         static string deviceId = null; 
 
         static void Main(string[] args)
@@ -64,6 +64,22 @@ namespace SampleModule
                 Console.WriteLine(ex.Message);
             }
         }
+
+        static string restApiServerModuleName;
+        static string restApiServerModulePort;
+        static HttpClient httpClient = null;
+        static void InitRestAPICalling()
+        {
+            restApiServerModuleName = System.Environment.GetEnvironmentVariable("RESTAPI_SERVER_MODULE_NAME");
+            restApiServerModulePort = System.Environment.GetEnvironmentVariable("RESTAPI_SERVER_MODULE_PORT");
+            if (string.IsNullOrEmpty(restApiServerModuleName)||string.IsNullOrEmpty(restApiServerModulePort)){
+                Console.WriteLine("REST API SeRVER settings are not enough");
+            }else{
+                httpClient = new HttpClient();
+            }
+        }
+
+
         /// <summary>
         /// Initializes the ModuleClient and sets up the callback to receive
         /// messages containing temperature information
@@ -71,6 +87,7 @@ namespace SampleModule
         static async Task Init()
         {
             await InitLocalBlobStorageAccess();
+            InitRestAPICalling();
 
             MqttTransportSettings mqttSetting = new MqttTransportSettings(TransportType.Mqtt_Tcp_Only);
             ITransportSettings[] settings = { mqttSetting };
@@ -83,8 +100,51 @@ namespace SampleModule
             // Register callback to be called when a message is received by the module
             await ioTHubModuleClient.SetMethodHandlerAsync(nameof(UploadFileToCloud), UploadFileToCloud, ioTHubModuleClient);
             await ioTHubModuleClient.SetMethodHandlerAsync(nameof(ReplaceFileFromCloud), ReplaceFileFromCloud, ioTHubModuleClient);
+            await ioTHubModuleClient.SetMethodHandlerAsync(nameof(InvokeRESTService), InvokeRESTService, ioTHubModuleClient);
         }
 
+        private static async Task<MethodResponse> InvokeRESTService(MethodRequest methodRequest, object userContext)
+        {
+            MethodResponse responseMessage = null;
+            if (httpClient== null){
+                string unsetMessage = "REST API Server module is not defined";
+                Console.WriteLine(unsetMessage);
+                responseMessage = new MethodResponse(System.Text.Encoding.UTF8.GetBytes(unsetMessage),500);
+            } else{
+                string payload = methodRequest.DataAsJson;
+                dynamic payloadJson = Newtonsoft.Json.JsonConvert.DeserializeObject(payload);
+                dynamic restApiMethodIn = payloadJson.method;
+                string restApiMethod = restApiMethodIn.Value;
+                dynamic restApiUriIn = payloadJson.uri;
+                string restApiUri = restApiUriIn.Value;
+                dynamic restApiBodyIn = payloadJson.body;
+                string restApiBody = restApiBodyIn.Value;
+                HttpResponseMessage httpResponse = null;
+                string invokeUri = "http://"+restApiServerModuleName + ":" + restApiServerModulePort + restApiUriIn;
+                Console.WriteLine("Invoking - " + invokeUri);
+                switch (restApiMethod){
+                    case "GET":
+                        httpResponse = await httpClient.GetAsync(invokeUri);
+                        break;
+                    case "POST":
+                        httpResponse = await httpClient.PostAsync(invokeUri, new StringContent(restApiBodyIn));
+                        break;
+                    default:
+                        Console.WriteLine("REST API method should be 'GET' or 'POST'");
+                        break;
+                } 
+                if (httpResponse!=null){
+                    if (httpResponse.StatusCode == System.Net.HttpStatusCode.OK){
+                        Console.WriteLine("REST API "+restApiMethod+" - Succeeded");
+                    }
+                    else {
+                        Console.WriteLine("REST API "+restApiMethod+" - Wrong - "+ httpResponse.StatusCode);
+                    }
+                    responseMessage = new MethodResponse(System.Text.Encoding.UTF8.GetBytes(await httpResponse.Content.ReadAsStringAsync()),(int) httpResponse.StatusCode);
+                }
+            }
+            return responseMessage;
+         }
         private static async Task<MethodResponse> UploadFileToCloud(MethodRequest methodRequest, object userContext)
         {
             Console.WriteLine("Invoked - " + nameof(UploadFileToCloud));

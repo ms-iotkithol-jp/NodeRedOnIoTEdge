@@ -78,6 +78,12 @@
               },
               "BLOB_ON_EDGE_CONTAINER_NAME": {
                   "value": "< Container Name for Cloud syncing >"
+              },
+              "RESTAPI_SERVER_MODULE_NAME": {
+                "value": "< Edge Module Name providing REST API Service - optional >"
+              },
+              "RESTAPI_SERVER_MODULE_PORT": {
+                "value": "< Edge Module Port providing REST API Service - optional >"
               }
             }
           },
