@@ -34,6 +34,12 @@ Node-Red を IoT Edge Runtime 上で動作させるときに便利なヘルパ�
     },
     "BLOB_ON_EDGE_CONTAINER_NAME": {
         "value": "< Container Name for Cloud syncing >"
+    },
+    "RESTAPI_SERVER_MODULE_NAME": {
+        "value": "< Edge Module Name providing REST API Service - optional >"
+    },
+    "RESTAPI_SERVER_MODULE_PORT": {
+        "value": "< Edge Module Port providing REST API Service - optional >"
     }
 }
 
@@ -49,13 +55,27 @@ payload : {"filename":"<i>uploading-file-name</i>"}
 
 ファイルの名前は以下のフォーマットで Blob on Edge に Upload される
 <i>deviceId</i>-<i>yyyyMMddHHmmss</i>-<i>uploading-file-name</i>  
-※ yyyy…の部分は、Upload時の日時 
+※ yyyy…の部分は、Upload時の日時  
+例） payloadで、"/data/flows.json" を指定した場合、Device Id が raspberrypi で、 2019年12月13日 16時28分49秒だった場合は、"raspberrypi-20191213162849-flows.json" という名前で Upload される。また、/data/の部分は、"createOptions" で、"Binds" 指定して、他の Module も含め共有できるようにしておくこと。   
 
-例） payloadで、"/data/flows.json" を指定した場合、Device Id が raspberrypi で、 2019年12月13日 16時28分49秒だった場合は、"raspberrypi-20191213162849-flows.json" という名前で Upload される。 
+※ 本機能を使うには、環境変数の BLOB_ON_EDGE_MODULE、BLOB_ON_EDGE_ACCOUNT_NAME、BLOB_ON_EDGE_ACCOUNT_KEY、BLOB_ON_EDGE_CONTAINER_NAME を設定し、Blob on Edge にアクセスできるようにすること  
 
 #### ReplaseFileFromCloud  
 指定したファイルの内容を書き換える。 
 
 palyload : {"filename":"<i>replacing-file-name</i>","content":"<i> any text </i>"}  
 
-<i>replacing-file-name</i> で指定したファイルが、 <i> any text </i> で夏期変わる。 
+<i>replacing-file-name</i> で指定したファイルが、 <i> any text </i> で書き変わる。 
+
+#### InvokeRESTService 
+同じ Runtime 上で動いている Module が公開している HTTP REST API をコールし、結果を返す。 
+
+payload : {"method":"<i>GET</i> or <i>POST</i>","uri":"<i>request uri</i>","body":"<i>content of body in the case POST</i>","header":["<i>header-key</i>:<i>header-value</i>",...]}
+
+※ 本機能を利用する場合には、環境変数の、RESTAPI_SERVER_MODULE_NAME、RESTAPI_SERVER_MODULE_PORT を設定すること。また、指定された REST API を提供する Module は、対応するHTTP REST API サービスを提供すること。  
+例えば、 
+
+- RESTAPI_SERVER_MODULE_NAME => "TibboPiIoTModule"
+- RESTAPI_SERVER_MODULE_PORT => "1880"  
+
+<B> Under Construction </B>

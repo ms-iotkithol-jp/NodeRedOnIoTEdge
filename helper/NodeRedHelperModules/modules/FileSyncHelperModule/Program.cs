@@ -119,19 +119,32 @@ namespace SampleModule
                 string restApiUri = restApiUriIn.Value;
                 dynamic restApiBodyIn = payloadJson.body;
                 string restApiBody = restApiBodyIn.Value;
+                dynamic restHeaderIn = payloadJson.header;
+                string restHeader = restHeaderIn.Value;
+                var httpContent = new StringContent(restApiBodyIn);
+                var headerValues = restHeader.Split(new char [] {','});
                 HttpResponseMessage httpResponse = null;
                 string invokeUri = "http://"+restApiServerModuleName + ":" + restApiServerModulePort + restApiUriIn;
                 Console.WriteLine("Invoking - " + invokeUri);
+                HttpRequestMessage requestMessage = null;
                 switch (restApiMethod){
                     case "GET":
-                        httpResponse = await httpClient.GetAsync(invokeUri);
+                        requestMessage = new HttpRequestMessage(HttpMethod.Get, invokeUri);
                         break;
                     case "POST":
-                        httpResponse = await httpClient.PostAsync(invokeUri, new StringContent(restApiBodyIn));
+                        requestMessage = new HttpRequestMessage(HttpMethod.Post, invokeUri);
                         break;
                     default:
                         Console.WriteLine("REST API method should be 'GET' or 'POST'");
                         break;
+                }
+                if (requestMessage!=null){
+                    requestMessage.Content = httpContent;
+                    foreach(var hr in headerValues) {
+                        var hrs = hr.Split(new char [] {':'});
+                        requestMessage.Headers.Add(hrs[0],hrs[1]);
+                    }
+                    httpResponse = await httpClient.SendAsync(requestMessage);
                 } 
                 if (httpResponse!=null){
                     if (httpResponse.StatusCode == System.Net.HttpStatusCode.OK){
