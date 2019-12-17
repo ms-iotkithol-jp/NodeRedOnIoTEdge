@@ -110,7 +110,8 @@ namespace SampleModule
                 string unsetMessage = "REST API Server module is not defined";
                 Console.WriteLine(unsetMessage);
                 responseMessage = new MethodResponse(System.Text.Encoding.UTF8.GetBytes(unsetMessage),500);
-            } else{
+            }
+            else{
                 string payload = methodRequest.DataAsJson;
                 dynamic payloadJson = Newtonsoft.Json.JsonConvert.DeserializeObject(payload);
                 dynamic restApiMethodIn = payloadJson.method;
@@ -121,7 +122,7 @@ namespace SampleModule
                 string restApiBody = restApiBodyIn.Value;
                 dynamic restHeaderIn = payloadJson.header;
                 string restHeader = restHeaderIn.Value;
-                var httpContent = new StringContent(restApiBodyIn);
+                var httpContent = new StringContent(restApiBody);
                 var headerValues = restHeader.Split(new char [] {','});
                 HttpResponseMessage httpResponse = null;
                 string invokeUri = "http://"+restApiServerModuleName + ":" + restApiServerModulePort + restApiUriIn;
@@ -141,11 +142,18 @@ namespace SampleModule
                 if (requestMessage!=null){
                     requestMessage.Content = httpContent;
                     foreach(var hr in headerValues) {
-                        var hrs = hr.Split(new char [] {':'});
-                        requestMessage.Headers.Add(hrs[0],hrs[1]);
+                        if (!string.IsNullOrEmpty(hr)){
+                            var hrs = hr.Split(new char [] {':'});
+                            requestMessage.Headers.Add(hrs[0],hrs[1]);
+                        }
                     }
-                    httpResponse = await httpClient.SendAsync(requestMessage);
-                } 
+                    try{
+                        httpResponse = await httpClient.SendAsync(requestMessage);
+                    }
+                    catch (Exception ex) {
+                        Console.WriteLine(ex.Message);
+                    }
+                }
                 if (httpResponse!=null){
                     if (httpResponse.StatusCode == System.Net.HttpStatusCode.OK){
                         Console.WriteLine("REST API "+restApiMethod+" - Succeeded");
