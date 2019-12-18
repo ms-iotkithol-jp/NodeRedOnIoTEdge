@@ -12,8 +12,9 @@
 $ sudo docker build -t tibbopi-iot-edge-module -f Dockerfile.arm32v7 .  
 $ sudo docker build tag tibbopi-iot-edge-module <i>your-docker-repository</i>/tibbopi-iot-edge-module  
 $ docker push <i>your-docker-repository</i>/tibbopi-iot-edge-module:latest  
-これで、Azure IoT Hub、IoT Edge デバイスから使えるようになるので、Azure ポータルなどで、IoT Edge デバイスに配置する。 
-配置の際のコンテナ―生成オプションはは、  
+これで、Azure IoT Hub、IoT Edge デバイスから使えるようになるので、Azure ポータルなどで、IoT Edge デバイスに配置する。  
+※ このDocker Image は、embeddedgeorge/file-sync-helper:0.2.0-arm32v7 からも公開中。  
+配置の際のコンテナ―生成オプションは、  
 ```json
 {
   "HostConfig": {
