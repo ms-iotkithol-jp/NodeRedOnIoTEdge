@@ -84,7 +84,7 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "embeddedgeorge/file-sync-helper:0.1.0-arm32v7",
+              "image": "embeddedgeorge/file-sync-helper:0.2.0-arm32v7",
               "createOptions": {
                 "HostConfig": {
                   "Binds": [
