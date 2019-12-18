@@ -57,7 +57,7 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${MODULES.TibboPiOnIoTEdgeModule.debug}",
+              "image": "${MODULES.TibboPiOnIoTEdgeModule.arm32v7}",
               "createOptions": {
                 "ExposedPorts": {
                   "9229/tcp": {}

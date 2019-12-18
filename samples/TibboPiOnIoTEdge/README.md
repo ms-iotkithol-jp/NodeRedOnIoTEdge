@@ -46,9 +46,21 @@ $ docker push <i>your-docker-repository</i>/tibbopi-iot-edge-module:latest
     ],
     "Privileged": true
   }
-}```
+}
+```
 
 Blob on Edge と file-sync-helper を併用すると、Node-Red のフローをリモートで収集・更新が可能になる。 
 
-#### VS Code + Azure IoT Edge Extension を使う場合 
+#### Flow のリモート取得と、配布  
+[file-sync-helper](../../helper/NodeRedHelperModules/modules/FyleSyncHelperModule) を併用することにより、ある一台の Tibbo-Pi で定義した Node-Red のフロー(flows.json)を、IoT Hub を通じて取得し、他の Tibbo-Pi のフローを取得したフローで更新することが可能である。  
+![UploadFileToCLoud](../../doc/images/UploadFLowsJsonToCloud.png) 
+で、flows.json を、 Azure の Blob Storage に格納し、 
+![ReplaceFlowsJson](../../doc/images/ReplaceFlowsJson.png) 
+で、別の Tibbo-Pi に、格納したFlows.json の中身を送り込み、 
+![InvokeRESTService](../../doc/images/InvokeRESTService.png)
+で、Node-Red にフローの変更を、 [REST API](https://nodered.org/docs/api/) を参考に指示する。  
+※ うーん。。。REST APIでアクセスするなら、その辺パッケージングしたHelperもありか。。。
+
+#### VS Code + Azure IoT Edge Extension を使う場合  
+
 ※ 書きかけ 
