@@ -105,6 +105,12 @@
               },
               "BLOB_ON_EDGE_CONTAINER_NAME": {
                   "value": "flows"
+              },
+              "RESTAPI_SERVER_MODULE_NAME": {
+                "value": "TibboPiOnIoTEdgeModule"
+              },
+              "RESTAPI_SERVER_MODULE_PORT": {
+                "value": "1880"
               }
             }
           },

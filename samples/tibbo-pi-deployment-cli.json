@@ -30,7 +30,7 @@
             }
           },
           "modules": {
-            "TibboPiIoTEdgeModule": {
+            "TibboPiOnIoTEdgeModule": {
               "version": "1.0",
               "type": "docker",
               "status": "running",
@@ -80,6 +80,12 @@
                 },
                 "FLOWS_CONTAINER_NAME": {
                   "value": "flows"
+                },
+                "RESTAPI_SERVER_MODULE_NAME": {
+                  "value": "TibboPiOnIoTEdgeModule"
+                },
+                "RESTAPI_SERVER_MODULE_PORT": {
+                  "value": "1880"
                 }
               }
             }
@@ -90,7 +96,7 @@
         "properties.desired": {
           "schemaVersion": "1.0",
           "routes": {
-            "TibboPiIoTEdgeModuleToIoTHub": "FROM /messages/modules/TibboPiIoTEdgeModule/outputs/* INTO $upstream"
+            "TibboPiOnIoTEdgeModuleToIoTHub": "FROM /messages/modules/TibboPiOnIoTEdgeModule/outputs/* INTO $upstream"
           },
           "storeAndForwardConfiguration": {
             "timeToLiveSecs": 7200
