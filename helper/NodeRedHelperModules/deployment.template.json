@@ -51,7 +51,7 @@
           }
         },
         "modules": {
-          "FileSyncHelperModule": {
+          "filesynchelpermodule": {
             "version": "1.0",
             "type": "docker",
             "status": "running",
@@ -125,7 +125,7 @@
       "properties.desired": {
         "schemaVersion": "1.0",
         "routes": {
-          "FileSyncHelperModuleToIoTHub": "FROM /messages/modules/FileSyncHelperModule/outputs/* INTO $upstream"
+          "FileSyncHelperModuleToIoTHub": "FROM /messages/modules/filesynchelpermodule/outputs/* INTO $upstream"
         },
         "storeAndForwardConfiguration": {
           "timeToLiveSecs": 7200

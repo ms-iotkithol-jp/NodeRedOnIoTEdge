@@ -105,6 +105,7 @@ namespace SampleModule
 
         private static async Task<MethodResponse> InvokeRESTService(MethodRequest methodRequest, object userContext)
         {
+            Console.WriteLine("{0} is invoked",nameof(InvokeRESTService));
             MethodResponse responseMessage = null;
             if (httpClient== null){
                 string unsetMessage = "REST API Server module is not defined";
@@ -113,6 +114,7 @@ namespace SampleModule
             }
             else{
                 string payload = methodRequest.DataAsJson;
+                Console.WriteLine("payload -'{0}'", payload);
                 dynamic payloadJson = Newtonsoft.Json.JsonConvert.DeserializeObject(payload);
                 dynamic restApiMethodIn = payloadJson.method;
                 string restApiMethod = restApiMethodIn.Value;
@@ -148,10 +150,14 @@ namespace SampleModule
                         }
                     }
                     try{
+                        Console.WriteLine("Send start");
                         httpResponse = await httpClient.SendAsync(requestMessage);
+                        Console.WriteLine("Send end");
                     }
                     catch (Exception ex) {
-                        Console.WriteLine(ex.Message);
+                        Console.WriteLine("SendAsync exception - " + ex.Message);
+                        string unsetMessage = "Exception happened - '" + ex.Message + "'";
+                        responseMessage = new MethodResponse(System.Text.Encoding.UTF8.GetBytes(unsetMessage),500);
                     }
                 }
                 if (httpResponse!=null){

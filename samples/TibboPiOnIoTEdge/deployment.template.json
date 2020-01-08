@@ -51,7 +51,7 @@
           }
         },
         "modules": {
-          "TibboPiOnIoTEdgeModule": {
+          "tibbopioniotedgemodule": {
             "version": "1.0",
             "type": "docker",
             "status": "running",
@@ -84,7 +84,7 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "embeddedgeorge/file-sync-helper:0.2.0-arm32v7",
+              "image": "embeddedgeorge/file-sync-helper:0.3.0-arm32v7",
               "createOptions": {
                 "HostConfig": {
                   "Binds": [
@@ -107,7 +107,7 @@
                   "value": "flows"
               },
               "RESTAPI_SERVER_MODULE_NAME": {
-                "value": "TibboPiOnIoTEdgeModule"
+                "value": "tibbopioniotedgemodule"
               },
               "RESTAPI_SERVER_MODULE_PORT": {
                 "value": "1880"
@@ -152,7 +152,7 @@
       "properties.desired": {
         "schemaVersion": "1.0",
         "routes": {
-          "TibboPiOnIoTEdgeModuleToIoTHub": "FROM /messages/modules/TibboPiOnIoTEdgeModule/outputs/* INTO $upstream"
+          "TibboPiOnIoTEdgeModuleToIoTHub": "FROM /messages/modules/tibbopioniotedgemodule/outputs/* INTO $upstream"
         },
         "storeAndForwardConfiguration": {
           "timeToLiveSecs": 7200
